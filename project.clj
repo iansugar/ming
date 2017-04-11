@@ -7,4 +7,5 @@
                  [ring/ring-core "1.5.0"]
                  [ring/ring-jetty-adapter "1.5.0"]
                  [clj-http "2.3.0"]
-                 [audiogum/picomock "0.1.11"]])
+                 [audiogum/picomock "0.1.11"]
+                 [compojure "1.5.2"]])
