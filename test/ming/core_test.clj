@@ -4,19 +4,24 @@
             [clj-http.client :as http]
             [picomock.core :as pico]))
 
-(defn foohandler [request]
-  {:status 200
-   :headers {"Content-Type" "text/html"}
-   :body "Hi!"})
+(deftest make-a-request-minimal
+  (ming/with-ming {:foo {:port 3101
+                         :handler (fn [request] {:status 200
+                                                :body "Hi!"})}}
+    (let [response (http/get "http://localhost:3101/foo")]
+      (is (= "Hi!"
+             (-> response :body))))))
 
-(deftest dosomemacro
-  (testing "macro thing"
-    (let [handler (pico/mockval {:status 200 :body "hello"})]
-      (ming/with-ming {:foo {:port 3101
-                             :handler handler}}
+(deftest make-a-request-with-picomock-handler
+  (let [handler (pico/mockval {:status 200 :body "hello"})]
+    (ming/with-ming {:foo {:port 3101
+                           :handler handler}}
+      (testing "response as expected"
         (let [response (http/get "http://localhost:3101/foo")]
-          (prn response)
           (is (= "hello"
-                 (:body response)))
-          (is (= 1
-                 (pico/mock-calls handler))))))))
+                 (-> response :body)))))
+      (testing "request made just once and had correct path"
+        (is (= 1
+               (pico/mock-calls handler)))
+        (is (= "/foo"
+               (-> (pico/mock-args handler) first first :uri)))))))
