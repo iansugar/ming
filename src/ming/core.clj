@@ -28,10 +28,6 @@
         (swap! servers (fn [s] (update s server-key #(dissoc % :server)))))
       (println (str "Server '" server-key "' not running")))))
 
-(defn requests
-  [servers port]
-  (-> @servers (get port) :requests))
-
 (defmacro with-ming
   [server-spec & body]
   `(let [servers# (atom ~server-spec)]
